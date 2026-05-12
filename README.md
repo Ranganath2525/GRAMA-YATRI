@@ -1,6 +1,7 @@
 Grama-Yatri 🚍
 Community-Powered Rural Transit Network
-<div align="center"> <img width="1200" height="475" alt="Grama-Yatri Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" /> </div>
+<img width="1355" height="649" alt="Screenshot 2026-05-12 112221" src="https://github.com/user-attachments/assets/97344735-c316-4eb4-84b8-96f501e082a3" />
+
 📌 Overview
 
 Grama-Yatri is a real-time rural mobility Android application designed to help villagers, students, and workers track village buses using community-powered live updates.
