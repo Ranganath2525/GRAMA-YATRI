@@ -445,6 +445,15 @@ export default function App() {
                                 {route.isPopular && (
                                   <span className="text-[8px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-amber-500/20">POPULAR</span>
                                 )}
+                                {status.lastPing && route.id === currentRoute.id && (
+                                  <motion.span 
+                                    animate={{ opacity: [0.5, 1, 0.5] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    className="text-[8px] bg-green-500 text-white px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-green-400"
+                                  >
+                                    LIVE NOW
+                                  </motion.span>
+                                )}
                                 <ChevronDown size={14} className={`transition-transform ${expandedRouteId === route.id ? 'rotate-180' : ''}`} />
                               </div>
                             </div>
@@ -694,13 +703,15 @@ export default function App() {
                   <p className="text-neutral-500 italic text-sm">No recent reports</p>
                 )}
               </div>
-              <div className="bg-neutral-800/50 p-5 rounded-2xl border border-neutral-700/50">
-                <p className="text-neutral-500 text-[10px] uppercase font-black tracking-widest mb-2">Estimated Arrival</p>
+          <div className="bg-neutral-800/50 p-5 rounded-2xl border border-neutral-700/50">
+                <p className="text-neutral-500 text-[10px] uppercase font-black tracking-widest mb-2">Live Timeline Status</p>
                 <div className="flex items-end gap-2">
-                  <span className="text-2xl font-black text-amber-500 leading-none">
-                    {status.lastPing ? 'LIVE' : '--'}
+                  <span className={`text-2xl font-black leading-none ${status.lastPing ? 'text-green-500' : 'text-neutral-500'}`}>
+                    {status.lastPing ? 'ACTIVE' : 'IDLE'}
                   </span>
-                  <span className="text-xs text-neutral-500 pb-0.5">Updated real-time</span>
+                  <span className="text-xs text-neutral-500 pb-0.5">
+                    {status.lastPing ? 'Updated by community' : 'Waiting for pings'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -709,22 +720,37 @@ export default function App() {
           {/* Interactive Actions */}
           <div className="flex-1 bg-amber-500 rounded-3xl p-10 flex flex-col justify-center items-center text-neutral-950 text-center shadow-[0_0_50px_rgba(245,158,11,0.15)] relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-            <h3 className="text-3xl font-black mb-2 italic uppercase tracking-tighter">Seen the Bus?</h3>
-            <p className="mb-8 font-bold text-neutral-900/80 max-w-xs">Help your village neighbors stay on schedule by reporting the location.</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md relative z-10">
+            <h3 className="text-3xl font-black mb-2 uppercase tracking-tighter italic">Live Timetable</h3>
+            <p className="mb-8 font-bold text-neutral-900/80 max-w-xs">Pinging a stop updates the arrival times for all villages ahead on this route.</p>
+            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md relative z-10">
               <button 
                 onClick={() => handlePing(currentRoute.stops[0].id)}
-                className="bg-neutral-950 text-white p-6 rounded-2xl font-black uppercase tracking-widest text-xs flex flex-col items-center gap-3 active:scale-95 transition-all shadow-2xl hover:bg-neutral-900 border border-white/5"
+                className="flex-1 bg-neutral-950 text-white p-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex flex-col items-center gap-3 active:scale-95 transition-all shadow-2xl hover:bg-neutral-900 border border-white/5"
               >
-                <BusLogo size={40} className="text-amber-500" />
-                I'm On-Board
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-neutral-950">
+                  <BusLogo size={24} />
+                </div>
+                Bus at Start
               </button>
               <button 
-                onClick={() => handlePing(currentRoute.stops[1].id)}
-                className="bg-neutral-950 text-white p-6 rounded-2xl font-black uppercase tracking-widest text-xs flex flex-col items-center gap-3 active:scale-95 transition-all shadow-2xl hover:bg-neutral-900 border border-white/5"
+                onClick={() => {
+                  if (status.lastPing) {
+                    const lastStopIndex = currentRoute.stops.findIndex(s => s.id === status.lastPing?.stopId);
+                    const nextStop = currentRoute.stops[lastStopIndex + 1];
+                    if (nextStop) {
+                      handlePing(nextStop.id);
+                      return;
+                    }
+                  }
+                  // Fallback to first intermediate stop if nothing else
+                  handlePing(currentRoute.stops[Math.min(1, currentRoute.stops.length - 1)].id);
+                }}
+                className="flex-1 bg-neutral-900 text-white p-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex flex-col items-center gap-3 active:scale-95 transition-all shadow-2xl hover:bg-neutral-800 border border-neutral-700"
               >
-                <MapPin className="text-amber-500" size={32} />
-                Just Passed
+                <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center text-amber-500 border border-neutral-700">
+                  <MapPin size={20} />
+                </div>
+                Ping Next Stop
               </button>
             </div>
           </div>
