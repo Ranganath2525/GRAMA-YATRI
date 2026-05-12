@@ -1,0 +1,13 @@
+{
+  "name": "Grama-Yatri",
+  "description": "A community-powered real-time bus tracker for rural mobility with 50+ network routes, helping passengers avoid long wait times through crowdsourced location pings.",
+  "requestFramePermissions": [
+    "geolocation",
+    "notifications"
+  ],
+  "majorCapabilities": [
+    "Real-time Data Fetching",
+    "Community Crowdsourcing",
+    "Dynamic ETA Calculation"
+  ]
+}

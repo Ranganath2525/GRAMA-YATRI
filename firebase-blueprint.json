@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "Route": {
+      "title": "Bus Route",
+      "description": "A complete bus route with all intermediate stops.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "source": { "type": "string" },
+        "destination": { "type": "string" },
+        "busNumber": { "type": "string" },
+        "stops": {
+          "type": "array",
+          "items": { "$ref": "Stop" }
+        },
+        "estimatedTime": { "type": "string" },
+        "isPopular": { "type": "boolean" },
+        "category": { "type": "string", "enum": ["MORNING", "EVENING", "GENERAL"] }
+      },
+      "required": ["id", "name", "source", "destination", "stops"]
+    },
+    "Stop": {
+      "title": "Bus Stop",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "nameKannada": { "type": "string" },
+        "distanceFromSourceKm": { "type": "number" },
+        "avgTravelTimeMins": { "type": "number" }
+      },
+      "required": ["id", "name", "distanceFromSourceKm", "avgTravelTimeMins"]
+    },
+    "Ping": {
+      "title": "Bus Ping",
+      "description": "A community-reported bus location update.",
+      "type": "object",
+      "properties": {
+        "routeId": { "type": "string", "description": "ID of the route this bus belongs to" },
+        "stopId": { "type": "string", "description": "ID of the stop where the bus was seen" },
+        "reporterName": { "type": "string", "description": "Name of the passenger who reported" },
+        "timestamp": { "type": "number", "description": "Unix timestamp of the report" },
+        "type": { "type": "string", "enum": ["ARRIVAL", "DEPARTURE", "PASSED"] },
+        "status": { "type": "string", "enum": ["ON_TIME", "DELAYED", "CANCELLED"] }
+      },
+      "required": ["routeId", "stopId", "reporterName", "timestamp", "type", "status"]
+    }
+  },
+  "firestore": {
+    "/routes/{routeId}": {
+      "schema": "Route",
+      "description": "Collection of all available bus routes."
+    },
+    "/pings/{pingId}": {
+      "schema": "Ping",
+      "description": "Collection of all bus location pings."
+    }
+  }
+}

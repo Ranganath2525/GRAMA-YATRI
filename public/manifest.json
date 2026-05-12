@@ -1,0 +1,15 @@
+{
+  "name": "Grama-Yatri",
+  "short_name": "GramaYatri",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "https://www.iconpacks.net/icons/2/free-bus-icon-3184-thumb.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    
+    function isValidPing(data) {
+      return data.keys().hasAll(['routeId', 'stopId', 'reporterName', 'timestamp', 'type', 'status'])
+        && data.keys().size() == 6
+        && data.routeId is string && data.routeId.size() <= 100
+        && data.stopId is string && data.stopId.size() <= 50
+        && data.reporterName is string && data.reporterName.size() <= 100
+        && data.timestamp is number
+        && data.type in ['ARRIVAL', 'DEPARTURE', 'PASSED']
+        && data.status in ['ON_TIME', 'DELAYED', 'CANCELLED'];
+    }
+
+    // 1. Pings Collection
+    match /pings/{pingId} {
+      // Allow anybody to read pings to see the live status
+      allow list: if true;
+      allow get: if true;
+      
+      // Only signed-in users can create pings
+      allow create: if isSignedIn() 
+        && isValidPing(incoming())
+        && incoming().timestamp > (request.time.toMillis() - 600000) // Within last 10 mins
+        && incoming().timestamp < (request.time.toMillis() + 60000); // Max 1 min in future
+
+      // No updates or deletes for pings - they are immutable events
+      allow update, delete: if false;
+    }
+
+    // 2. Routes Collection
+    match /routes/{routeId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if false; 
+    }
+  }
+}
